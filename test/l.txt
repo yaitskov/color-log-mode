@@ -1,0 +1,11 @@
+Test suite test: RUNNING...
+th-process
+  test/Discovery.hs
+    hello
+      hello:             OK
+    refined less than 5: OK
+      +++ OK, passed 100 tests.
+
+All 2 tests passed (0.00s)
+Test suite test: PASS
+Test suite logged to: /home/dan/pro/seed-projects/th-process/th-process/dist-newstyle/build/x86_64-linux/ghc-9.4.7/th-process-0.0.1/t/test/test/th-process-0.0.1-test.log

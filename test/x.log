@@ -1,0 +1,11 @@
+Test suite test: RUNNING...
+th-process
+  test/Discovery.hs
+    hello
+      hello:             [32;22mOK[m[32;22m
+[m    refined less than 5: [32;22mOK[m[32;22m
+[m[37;22m      +++ OK, passed 100 tests.
+[m
+[32;22mAll 2 tests passed[m[32;22m (0.00s)
+[mTest suite test: PASS
+Test suite logged to: /home/dan/pro/seed-projects/th-process/th-process/dist-newstyle/build/x86_64-linux/ghc-9.4.7/th-process-0.0.1/t/test/test/th-process-0.0.1-test.log
