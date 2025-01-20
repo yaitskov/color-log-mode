@@ -69,6 +69,7 @@ The mode does not have any shortcut binding."
      (read-only-mode)
      (run-hooks 'color-log-mode-evaled-hook))))
 
+;;;###autoload(autoload 'color-log-mode "color-log-mode")
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.log$" . color-log-mode))
 
 (provide 'color-log-mode)
