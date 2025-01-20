@@ -11,6 +11,7 @@ e.pkgs.trivialBuild {
   src = ./.;
 
   packageRequires = [ e.pkgs.ert-async ];
+  nativeBuildInputs = [ git ];
 
   buildPhase = ''
     runHook preBuild
