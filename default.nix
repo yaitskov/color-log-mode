@@ -10,7 +10,7 @@ e.pkgs.trivialBuild {
 
   src = ./.;
 
-  packageRequires = [ ];
+  packageRequires = [ e.pkgs.ert-async ];
 
   buildPhase = ''
     runHook preBuild
