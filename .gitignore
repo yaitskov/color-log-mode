@@ -1,3 +1,4 @@
 test/l.log
 test/*.elt
+*-autoloads.el
 /result

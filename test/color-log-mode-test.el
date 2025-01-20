@@ -1,5 +1,6 @@
 ;;; color-log-mode-test.el --- test color-log package  -*- lexical-binding: t -*-
 (require 'color-log-mode)
+(require 'color-log-mode-autoloads)
 (require 'ert)
 (require 'ert-async)
 
