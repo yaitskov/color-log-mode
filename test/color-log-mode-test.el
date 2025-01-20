@@ -12,6 +12,8 @@
           (let ((plain (with-current-buffer "l.txt" (buffer-string)))
                 (faced (with-current-buffer "l.log" (buffer-string))))
             (remove-hook 'color-log-mode-evaled-hook check-SGR-exanded)
+            (when (not (with-current-buffer "l.log" buffer-read-only))
+              (funcall end "Buffer for [l.log] is not in read only mode"))
             (if (equal plain faced)
                 (funcall end)
               (funcall end (format "Expected:\n%s\nGot:\n%s\n" plain faced)))))))
