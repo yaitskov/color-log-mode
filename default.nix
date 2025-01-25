@@ -10,7 +10,7 @@ e.pkgs.trivialBuild {
 
   src = ./.;
 
-  packageRequires = [ e.pkgs.ert-async ];
+  packageRequires = [ e.pkgs.ert-async e.pkgs.f ];
   nativeBuildInputs = [ git ];
 
   buildPhase = ''
