@@ -81,6 +81,11 @@ The mode does not have any shortcut binding."
                      (color-log-mode-clear-hook-locally 'kill-buffer-hook)
                      (setq buffer-file-name nil)
                      (read-only-mode))))
+         (when (not buffer-read-only)
+           (run-at-time 0 nil (lambda ()
+                                (when (buffer-live-p bn)
+                                  (with-current-buffer bn (color-log-mode))
+                                  (message "Auto disable color-mode")))))
          (run-hooks 'color-log-mode-evaled-hook))))))
 
 ;;;###autoload(autoload 'color-log-mode "color-log-mode")
