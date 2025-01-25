@@ -69,24 +69,25 @@ The mode does not have any shortcut binding."
   :lighter  (:propertize " l" face color-log-mode-face)
   :after-hook
   (let ((bn (current-buffer)))
-    (run-at-time ;; async hack because setting buffer-file-name to nil breaks
-     0 nil
-     (lambda ()
-       (with-current-buffer bn
-         (when (and (< (point-max) color-log-mode-big-file-size) (> (point-max) 5))
+    (when (bound-and-true-p color-log-mode) ;; prevent looping when mode tries to disable itself
+      (run-at-time ;; async hack because setting buffer-file-name to nil breaks
+       0 nil
+       (lambda ()
+         (with-current-buffer bn
+           (when (and (< (point-max) color-log-mode-big-file-size) (> (point-max) 5))
              (let ((bufsize (point-max)))
                (ansi-color-apply-on-region (point-min) (point-max))
                (when (< (point-max) bufsize) ;; at least 1 SGR code is removed
-                     ;; coloring function changes content and emacs always prompts on buffer kill
-                     (color-log-mode-clear-hook-locally 'kill-buffer-hook)
-                     (setq buffer-file-name nil)
-                     (read-only-mode))))
-         (when (not buffer-read-only)
-           (run-at-time 0 nil (lambda ()
-                                (when (buffer-live-p bn)
-                                  (with-current-buffer bn (color-log-mode))
-                                  (message "Auto disable color-mode")))))
-         (run-hooks 'color-log-mode-evaled-hook))))))
+                 ;; coloring function changes content and emacs always prompts on buffer kill
+                 (color-log-mode-clear-hook-locally 'kill-buffer-hook)
+                 (setq buffer-file-name nil)
+                 (read-only-mode))))
+           (when (not buffer-read-only)
+             (run-at-time 0 nil (lambda ()
+                                  (when (buffer-live-p bn)
+                                    (with-current-buffer bn (color-log-mode -1))
+                                    (message "Auto disable color-log-mode")))))
+           (run-hooks 'color-log-mode-evaled-hook)))))))
 
 ;;;###autoload(autoload 'color-log-mode "color-log-mode")
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.log$" . color-log-mode))
