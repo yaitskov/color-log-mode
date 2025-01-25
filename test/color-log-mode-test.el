@@ -7,11 +7,21 @@
 
 ;;; Code:
 
+(defun without-buffers ()
+  "Kill all buffers except system ones.
+
+Those which names start with asterisk."
+  (mapc (lambda (b)
+          (let ((bn (string-trim-left (buffer-name b))))
+            (when (not (string-prefix-p "*" bn))
+              (message "kill-buffer [%s]" bn)
+              (kill-buffer b))))
+        (buffer-list)))
+
 (ert-deftest-async eval-SGR-test (end)
   (letrec
       ((check-SGR-exanded
         (lambda ()
-          (unwind-protect
               (let ((plain (with-current-buffer "l.txt" (buffer-string)))
                     (faced (with-current-buffer "l.log" (buffer-string))))
                 (remove-hook 'color-log-mode-evaled-hook check-SGR-exanded)
@@ -19,10 +29,9 @@
                   (funcall end "Buffer for [l.log] is not in read only mode"))
                 (if (equal plain faced)
                     (funcall end)
-                  (funcall end (format "Expected:\n%s\nGot:\n%s\n" plain faced))))
-            (kill-buffer "l.txt")
-            (kill-buffer "l.log")))))
+                  (funcall end (format "Expected:\n%s\nGot:\n%s\n" plain faced)))))))
     (copy-file "./x.log" "l.log" t)
+    (without-buffers)
     (find-file "l.txt")
     (add-hook 'color-log-mode-evaled-hook check-SGR-exanded)
     (find-file "l.log")))
@@ -31,16 +40,14 @@
   (letrec ((log-file "no-existing.log")
            (check
             (lambda ()
-              (unwind-protect
-                  (progn
-                    (remove-hook 'color-log-mode-evaled-hook check)
-                    (when buffer-read-only
-                      (funcall end (concat "Buffer for [" log-file "] is immutable")))
-                    (funcall end))
-                (kill-buffer (current-buffer))))))
+              (remove-hook 'color-log-mode-evaled-hook check)
+              (when buffer-read-only
+                (funcall end (concat "Buffer for [" log-file "] is immutable")))
+              (funcall end))))
     (when (file-exists-p log-file)
       (delete-file log-file))
     (add-hook 'color-log-mode-evaled-hook check)
+    (without-buffers)
     (find-file log-file)))
 
 (ert-deftest-async skip-big-file-test (end)
@@ -50,18 +57,17 @@
         (lambda () (set (make-local-variable 'color-log-mode-big-file-size) 3)))
        (check-SGR-exanded
         (lambda ()
-          (unwind-protect
-              (let ((expected (f-read-text "x.log"))
-                    (notfaced (buffer-string)))
-                (remove-hook 'color-log-mode-hook override-file-limit)
-                (remove-hook 'color-log-mode-evaled-hook check-SGR-exanded)
-                (when buffer-read-only
-                  (funcall end (concat "Buffer for [" l-log "] is immutable")))
-                (if (equal notfaced expected)
-                    (funcall end)
-                  (funcall end (format "Expected:\n%s\nGot:\n%s\n" expected notfaced))))
-            (kill-buffer (current-buffer))))))
+          (let ((expected (f-read-text "x.log"))
+                (notfaced (buffer-string)))
+            (remove-hook 'color-log-mode-hook override-file-limit)
+            (remove-hook 'color-log-mode-evaled-hook check-SGR-exanded)
+            (when buffer-read-only
+              (funcall end (concat "Buffer for [" l-log "] is immutable")))
+            (if (equal notfaced expected)
+                (funcall end)
+              (funcall end (format "Expected:\n%s\nGot:\n%s\n" expected notfaced)))))))
     (copy-file "./x.log" l-log t)
+    (without-buffers)
     (find-file "l.txt")
     (add-hook 'color-log-mode-evaled-hook check-SGR-exanded)
     (add-hook 'color-log-mode-hook override-file-limit)
@@ -71,18 +77,17 @@
   (letrec
       ((check-SGR-exanded
         (lambda ()
-          (unwind-protect
-              (let ((plain (f-read-text "l.txt"))
-                    (notfaced (buffer-string)))
-                (remove-hook 'color-log-mode-evaled-hook check-SGR-exanded)
-                (when buffer-read-only
-                  (funcall end "Buffer for [l.log] is in read only mode"))
-                (if (equal plain notfaced)
-                    (funcall end)
-                  (funcall end (format "Expected:\n%s\nGot:\n%s\n" plain notfaced))))
-            (kill-buffer (current-buffer))))))
+          (let ((plain (f-read-text "l.txt"))
+                (notfaced (buffer-string)))
+            (remove-hook 'color-log-mode-evaled-hook check-SGR-exanded)
+            (when buffer-read-only
+              (funcall end "Buffer for [l.log] is in read only mode"))
+            (if (equal plain notfaced)
+                (funcall end)
+              (funcall end (format "Expected:\n%s\nGot:\n%s\n%s" plain notfaced (buffer-name))))))))
     (copy-file "./l.txt" "l.log" t)
     (add-hook 'color-log-mode-evaled-hook check-SGR-exanded)
+    (without-buffers)
     (find-file "l.log")))
 
 (provide 'color-log-mode-test)
