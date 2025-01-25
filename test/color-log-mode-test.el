@@ -23,5 +23,18 @@
     (add-hook 'color-log-mode-evaled-hook check-SGR-exanded)
     (find-file "l.log")))
 
+(ert-deftest-async skip-empty-file-test (end)
+  (letrec ((log-file "no-existing.log")
+           (check
+            (lambda ()
+              (remove-hook 'color-log-mode-evaled-hook check)
+              (when (with-current-buffer log-file buffer-read-only)
+                (funcall end (concat "Buffer for [" log-file "] is immutable")))
+              (funcall end))))
+    (when (file-exists-p log-file)
+      (delete-file log-file))
+    (add-hook 'color-log-mode-evaled-hook check)
+    (find-file log-file)))
+
 (provide 'color-log-mode-test)
 ;;; color-log-mode-test.el ends here

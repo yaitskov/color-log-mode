@@ -59,15 +59,18 @@ The mode does not have any shortcut binding."
   ;; lighter text does not support multiple faces (all chars are styled with the first face)
   :lighter  (:propertize " l" face color-log-mode-face)
   :after-hook
-  (run-at-time ;; async hack because setting buffer-file-name to nil breaks
-   0 nil
-   (lambda ()
-     ;; coloring function changes content and emacs always prompts on buffer kill
-     (color-log-mode-clear-hook-locally 'kill-buffer-hook)
-     (setq buffer-file-name nil)
-     (ansi-color-apply-on-region (point-min) (point-max))
-     (read-only-mode)
-     (run-hooks 'color-log-mode-evaled-hook))))
+  (let ((bn (current-buffer)))
+    (run-at-time ;; async hack because setting buffer-file-name to nil breaks
+     0 nil
+     (lambda ()
+       (with-current-buffer bn
+         (when (> (point-max) 5)
+           ;; coloring function changes content and emacs always prompts on buffer kill
+           (color-log-mode-clear-hook-locally 'kill-buffer-hook)
+           (setq buffer-file-name nil)
+           (ansi-color-apply-on-region (point-min) (point-max))
+           (read-only-mode))
+         (run-hooks 'color-log-mode-evaled-hook))))))
 
 ;;;###autoload(autoload 'color-log-mode "color-log-mode")
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.log$" . color-log-mode))
