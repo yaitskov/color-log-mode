@@ -2,3 +2,5 @@ test/l.log
 test/*.elt
 *-autoloads.el
 /result
+/test/melpa/packages
+/test/melpa/working
