@@ -67,5 +67,23 @@
     (add-hook 'color-log-mode-hook override-file-limit)
     (find-file l-log)))
 
+(ert-deftest-async skip-file-without-any-SGR-test (end)
+  (letrec
+      ((check-SGR-exanded
+        (lambda ()
+          (unwind-protect
+              (let ((plain (f-read-text "l.txt"))
+                    (notfaced (buffer-string)))
+                (remove-hook 'color-log-mode-evaled-hook check-SGR-exanded)
+                (when buffer-read-only
+                  (funcall end "Buffer for [l.log] is in read only mode"))
+                (if (equal plain notfaced)
+                    (funcall end)
+                  (funcall end (format "Expected:\n%s\nGot:\n%s\n" plain notfaced))))
+            (kill-buffer (current-buffer))))))
+    (copy-file "./l.txt" "l.log" t)
+    (add-hook 'color-log-mode-evaled-hook check-SGR-exanded)
+    (find-file "l.log")))
+
 (provide 'color-log-mode-test)
 ;;; color-log-mode-test.el ends here

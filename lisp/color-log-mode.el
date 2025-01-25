@@ -52,10 +52,10 @@
 (defvar color-log-mode-evaled-hook nil
   "Hook is run when all SGR code are expanded.")
 
-(defgroup color-log-mode nil "Color log options."
+(defgroup color-log-mode nil "."
   :group 'text)
 
-(defcustom color-log-mode-big-file-size (* 1000 1000 10)
+(defcustom color-log-mode-big-file-size 10000000
   "Maximum file size in bytes to be processed.
 In case of a bigger file the mode is not activated."
   :group 'color-log-mode
@@ -73,12 +73,17 @@ The mode does not have any shortcut binding."
      0 nil
      (lambda ()
        (with-current-buffer bn
-         (when (and (< (point-max) color-log-mode-big-file-size) (> (point-max) 5))
-           ;; coloring function changes content and emacs always prompts on buffer kill
-           (color-log-mode-clear-hook-locally 'kill-buffer-hook)
-           (setq buffer-file-name nil)
-           (ansi-color-apply-on-region (point-min) (point-max))
-           (read-only-mode))
+         (if (and (< (point-max) color-log-mode-big-file-size) (> (point-max) 5))
+           (let ((bufsize (point-max)))
+             (ansi-color-apply-on-region (point-min) (point-max))
+             (if (< (point-max) bufsize) ;; at least 1 SGR code is removed
+                 (progn
+                   ;; coloring function changes content and emacs always prompts on buffer kill
+                   (color-log-mode-clear-hook-locally 'kill-buffer-hook)
+                   (setq buffer-file-name nil)
+                   (read-only-mode))
+               (color-log-mode)))
+           (color-log-mode))
          (run-hooks 'color-log-mode-evaled-hook))))))
 
 ;;;###autoload(autoload 'color-log-mode "color-log-mode")
