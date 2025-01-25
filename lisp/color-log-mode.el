@@ -73,18 +73,14 @@ The mode does not have any shortcut binding."
      0 nil
      (lambda ()
        (with-current-buffer bn
-         (if (and (< (point-max) color-log-mode-big-file-size) (> (point-max) 5))
+         (when (and (< (point-max) color-log-mode-big-file-size) (> (point-max) 5))
              (let ((bufsize (point-max)))
-
                (ansi-color-apply-on-region (point-min) (point-max))
-               (if (< (point-max) bufsize) ;; at least 1 SGR code is removed
-                   (progn
+               (when (< (point-max) bufsize) ;; at least 1 SGR code is removed
                      ;; coloring function changes content and emacs always prompts on buffer kill
                      (color-log-mode-clear-hook-locally 'kill-buffer-hook)
                      (setq buffer-file-name nil)
-                     (read-only-mode))
-                 (color-log-mode)))
-           (color-log-mode))
+                     (read-only-mode))))
          (run-hooks 'color-log-mode-evaled-hook))))))
 
 ;;;###autoload(autoload 'color-log-mode "color-log-mode")
