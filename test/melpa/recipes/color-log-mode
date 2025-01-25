@@ -1,0 +1,3 @@
+(color-log-mode
+ :url "file:///home/dan/pro/my-emacs/color-log-mode"
+ :fetcher git)
