@@ -3,6 +3,11 @@
 with pkgs ;
 let
   e = pkgs.emacs29;
+  ert-scope = import (fetchFromGitHub { owner = "yaitskov";
+                                        repo = "ert-scope";
+                                        rev = "master";
+                                        hash = "sha256-xb6h6ZJdx7QZf5cnQHw3mWcGACDatCYvlwKKevzRhGM=";
+                                      }) {} ; # /home/dan/pro/my-emacs/ert-scope {};
 in
 e.pkgs.trivialBuild {
   pname = "color-log-mode";
@@ -10,7 +15,7 @@ e.pkgs.trivialBuild {
 
   src = ./.;
 
-  packageRequires = [ e.pkgs.ert-async e.pkgs.f ];
+  packageRequires = [ e.pkgs.ert-async e.pkgs.f ert-scope ];
   nativeBuildInputs = [ git ];
 
   buildPhase = ''
